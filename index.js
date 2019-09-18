@@ -50,6 +50,7 @@ const typeDefs = gql`
     users: [User!]!
     user(userId: ID!): User
     products: [Product!]!
+    product(productId: ID!): Product
   }
 
   type Mutation {
@@ -62,6 +63,13 @@ const typeDefs = gql`
       price: Int
       phoneNumber: String!
     ): Product!
+    updateProduct(
+      productId: ID!
+      productDescription: String
+      price: Int
+      phoneNumber: String
+    ): Product!
+    deleteProduct(productId: ID!): Product!
     signUp(name: String!): User
   }
 `;
@@ -105,6 +113,9 @@ const resolvers = {
     products: async (root, args, context) => {
       return await context.prisma.products();
     },
+    product: async (root, args, context) => {
+      return await context.prisma.product({ id: args.productId });
+    },
     users: async (root, args, context) => {
       return await context.prisma.users();
     }
@@ -140,6 +151,19 @@ const resolvers = {
         }
       };
       return context.prisma.createProduct(newProduct);
+    },
+    updateProduct: (root, args, context) => {
+      return context.prisma.updateProduct({
+        where: { id: args.productId },
+        data: {
+          productDescription: args.productDescription,
+          price: args.price,
+          phoneNumber: args.phoneNumber
+        }
+      });
+    },
+    deleteProduct: (root, args, context) => {
+      return context.prisma.deleteProduct({ id: args.productId });
     },
     signUp: async (root, args, context) =>
       await context.prisma.createUser({ name: args.name })
