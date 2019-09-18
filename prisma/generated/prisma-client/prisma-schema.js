@@ -7,6 +7,10 @@ module.exports = {
   count: Int!
 }
 
+type AggregateProduct {
+  count: Int!
+}
+
 type AggregateUser {
   count: Int!
 }
@@ -14,6 +18,8 @@ type AggregateUser {
 type BatchPayload {
   count: Long!
 }
+
+scalar DateTime
 
 scalar Long
 
@@ -24,6 +30,12 @@ type Mutation {
   upsertPost(where: PostWhereUniqueInput!, create: PostCreateInput!, update: PostUpdateInput!): Post!
   deletePost(where: PostWhereUniqueInput!): Post
   deleteManyPosts(where: PostWhereInput): BatchPayload!
+  createProduct(data: ProductCreateInput!): Product!
+  updateProduct(data: ProductUpdateInput!, where: ProductWhereUniqueInput!): Product
+  updateManyProducts(data: ProductUpdateManyMutationInput!, where: ProductWhereInput): BatchPayload!
+  upsertProduct(where: ProductWhereUniqueInput!, create: ProductCreateInput!, update: ProductUpdateInput!): Product!
+  deleteProduct(where: ProductWhereUniqueInput!): Product
+  deleteManyProducts(where: ProductWhereInput): BatchPayload!
   createUser(data: UserCreateInput!): User!
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
@@ -51,6 +63,8 @@ type PageInfo {
 
 type Post {
   id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   description: String!
   user: User!
 }
@@ -85,12 +99,18 @@ type PostEdge {
 enum PostOrderByInput {
   id_ASC
   id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
   description_ASC
   description_DESC
 }
 
 type PostPreviousValues {
   id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
   description: String!
 }
 
@@ -109,6 +129,22 @@ input PostScalarWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
   description: String
   description_not: String
   description_in: [String!]
@@ -206,6 +242,22 @@ input PostWhereInput {
   id_not_starts_with: ID
   id_ends_with: ID
   id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
   description: String
   description_not: String
   description_in: [String!]
@@ -230,10 +282,298 @@ input PostWhereUniqueInput {
   id: ID
 }
 
+type Product {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  productDescription: String!
+  price: Float
+  phoneNumber: String!
+  user: User!
+}
+
+type ProductConnection {
+  pageInfo: PageInfo!
+  edges: [ProductEdge]!
+  aggregate: AggregateProduct!
+}
+
+input ProductCreateInput {
+  id: ID
+  productDescription: String!
+  price: Float
+  phoneNumber: String!
+  user: UserCreateOneWithoutProductsInput!
+}
+
+input ProductCreateManyWithoutUserInput {
+  create: [ProductCreateWithoutUserInput!]
+  connect: [ProductWhereUniqueInput!]
+}
+
+input ProductCreateWithoutUserInput {
+  id: ID
+  productDescription: String!
+  price: Float
+  phoneNumber: String!
+}
+
+type ProductEdge {
+  node: Product!
+  cursor: String!
+}
+
+enum ProductOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  productDescription_ASC
+  productDescription_DESC
+  price_ASC
+  price_DESC
+  phoneNumber_ASC
+  phoneNumber_DESC
+}
+
+type ProductPreviousValues {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  productDescription: String!
+  price: Float
+  phoneNumber: String!
+}
+
+input ProductScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  productDescription: String
+  productDescription_not: String
+  productDescription_in: [String!]
+  productDescription_not_in: [String!]
+  productDescription_lt: String
+  productDescription_lte: String
+  productDescription_gt: String
+  productDescription_gte: String
+  productDescription_contains: String
+  productDescription_not_contains: String
+  productDescription_starts_with: String
+  productDescription_not_starts_with: String
+  productDescription_ends_with: String
+  productDescription_not_ends_with: String
+  price: Float
+  price_not: Float
+  price_in: [Float!]
+  price_not_in: [Float!]
+  price_lt: Float
+  price_lte: Float
+  price_gt: Float
+  price_gte: Float
+  phoneNumber: String
+  phoneNumber_not: String
+  phoneNumber_in: [String!]
+  phoneNumber_not_in: [String!]
+  phoneNumber_lt: String
+  phoneNumber_lte: String
+  phoneNumber_gt: String
+  phoneNumber_gte: String
+  phoneNumber_contains: String
+  phoneNumber_not_contains: String
+  phoneNumber_starts_with: String
+  phoneNumber_not_starts_with: String
+  phoneNumber_ends_with: String
+  phoneNumber_not_ends_with: String
+  AND: [ProductScalarWhereInput!]
+  OR: [ProductScalarWhereInput!]
+  NOT: [ProductScalarWhereInput!]
+}
+
+type ProductSubscriptionPayload {
+  mutation: MutationType!
+  node: Product
+  updatedFields: [String!]
+  previousValues: ProductPreviousValues
+}
+
+input ProductSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: ProductWhereInput
+  AND: [ProductSubscriptionWhereInput!]
+  OR: [ProductSubscriptionWhereInput!]
+  NOT: [ProductSubscriptionWhereInput!]
+}
+
+input ProductUpdateInput {
+  productDescription: String
+  price: Float
+  phoneNumber: String
+  user: UserUpdateOneRequiredWithoutProductsInput
+}
+
+input ProductUpdateManyDataInput {
+  productDescription: String
+  price: Float
+  phoneNumber: String
+}
+
+input ProductUpdateManyMutationInput {
+  productDescription: String
+  price: Float
+  phoneNumber: String
+}
+
+input ProductUpdateManyWithoutUserInput {
+  create: [ProductCreateWithoutUserInput!]
+  delete: [ProductWhereUniqueInput!]
+  connect: [ProductWhereUniqueInput!]
+  set: [ProductWhereUniqueInput!]
+  disconnect: [ProductWhereUniqueInput!]
+  update: [ProductUpdateWithWhereUniqueWithoutUserInput!]
+  upsert: [ProductUpsertWithWhereUniqueWithoutUserInput!]
+  deleteMany: [ProductScalarWhereInput!]
+  updateMany: [ProductUpdateManyWithWhereNestedInput!]
+}
+
+input ProductUpdateManyWithWhereNestedInput {
+  where: ProductScalarWhereInput!
+  data: ProductUpdateManyDataInput!
+}
+
+input ProductUpdateWithoutUserDataInput {
+  productDescription: String
+  price: Float
+  phoneNumber: String
+}
+
+input ProductUpdateWithWhereUniqueWithoutUserInput {
+  where: ProductWhereUniqueInput!
+  data: ProductUpdateWithoutUserDataInput!
+}
+
+input ProductUpsertWithWhereUniqueWithoutUserInput {
+  where: ProductWhereUniqueInput!
+  update: ProductUpdateWithoutUserDataInput!
+  create: ProductCreateWithoutUserInput!
+}
+
+input ProductWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  productDescription: String
+  productDescription_not: String
+  productDescription_in: [String!]
+  productDescription_not_in: [String!]
+  productDescription_lt: String
+  productDescription_lte: String
+  productDescription_gt: String
+  productDescription_gte: String
+  productDescription_contains: String
+  productDescription_not_contains: String
+  productDescription_starts_with: String
+  productDescription_not_starts_with: String
+  productDescription_ends_with: String
+  productDescription_not_ends_with: String
+  price: Float
+  price_not: Float
+  price_in: [Float!]
+  price_not_in: [Float!]
+  price_lt: Float
+  price_lte: Float
+  price_gt: Float
+  price_gte: Float
+  phoneNumber: String
+  phoneNumber_not: String
+  phoneNumber_in: [String!]
+  phoneNumber_not_in: [String!]
+  phoneNumber_lt: String
+  phoneNumber_lte: String
+  phoneNumber_gt: String
+  phoneNumber_gte: String
+  phoneNumber_contains: String
+  phoneNumber_not_contains: String
+  phoneNumber_starts_with: String
+  phoneNumber_not_starts_with: String
+  phoneNumber_ends_with: String
+  phoneNumber_not_ends_with: String
+  user: UserWhereInput
+  AND: [ProductWhereInput!]
+  OR: [ProductWhereInput!]
+  NOT: [ProductWhereInput!]
+}
+
+input ProductWhereUniqueInput {
+  id: ID
+}
+
 type Query {
   post(where: PostWhereUniqueInput!): Post
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
   postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
+  product(where: ProductWhereUniqueInput!): Product
+  products(where: ProductWhereInput, orderBy: ProductOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Product]!
+  productsConnection(where: ProductWhereInput, orderBy: ProductOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ProductConnection!
   user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
@@ -242,6 +582,7 @@ type Query {
 
 type Subscription {
   post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
+  product(where: ProductSubscriptionWhereInput): ProductSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
 
@@ -249,6 +590,7 @@ type User {
   id: ID!
   name: String!
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
+  products(where: ProductWhereInput, orderBy: ProductOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Product!]
 }
 
 type UserConnection {
@@ -261,6 +603,7 @@ input UserCreateInput {
   id: ID
   name: String!
   posts: PostCreateManyWithoutUserInput
+  products: ProductCreateManyWithoutUserInput
 }
 
 input UserCreateOneWithoutPostsInput {
@@ -268,9 +611,21 @@ input UserCreateOneWithoutPostsInput {
   connect: UserWhereUniqueInput
 }
 
+input UserCreateOneWithoutProductsInput {
+  create: UserCreateWithoutProductsInput
+  connect: UserWhereUniqueInput
+}
+
 input UserCreateWithoutPostsInput {
   id: ID
   name: String!
+  products: ProductCreateManyWithoutUserInput
+}
+
+input UserCreateWithoutProductsInput {
+  id: ID
+  name: String!
+  posts: PostCreateManyWithoutUserInput
 }
 
 type UserEdge {
@@ -311,6 +666,7 @@ input UserSubscriptionWhereInput {
 input UserUpdateInput {
   name: String
   posts: PostUpdateManyWithoutUserInput
+  products: ProductUpdateManyWithoutUserInput
 }
 
 input UserUpdateManyMutationInput {
@@ -324,13 +680,31 @@ input UserUpdateOneRequiredWithoutPostsInput {
   connect: UserWhereUniqueInput
 }
 
+input UserUpdateOneRequiredWithoutProductsInput {
+  create: UserCreateWithoutProductsInput
+  update: UserUpdateWithoutProductsDataInput
+  upsert: UserUpsertWithoutProductsInput
+  connect: UserWhereUniqueInput
+}
+
 input UserUpdateWithoutPostsDataInput {
   name: String
+  products: ProductUpdateManyWithoutUserInput
+}
+
+input UserUpdateWithoutProductsDataInput {
+  name: String
+  posts: PostUpdateManyWithoutUserInput
 }
 
 input UserUpsertWithoutPostsInput {
   update: UserUpdateWithoutPostsDataInput!
   create: UserCreateWithoutPostsInput!
+}
+
+input UserUpsertWithoutProductsInput {
+  update: UserUpdateWithoutProductsDataInput!
+  create: UserCreateWithoutProductsInput!
 }
 
 input UserWhereInput {
@@ -365,6 +739,9 @@ input UserWhereInput {
   posts_every: PostWhereInput
   posts_some: PostWhereInput
   posts_none: PostWhereInput
+  products_every: ProductWhereInput
+  products_some: ProductWhereInput
+  products_none: ProductWhereInput
   AND: [UserWhereInput!]
   OR: [UserWhereInput!]
   NOT: [UserWhereInput!]

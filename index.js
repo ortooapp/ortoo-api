@@ -1,19 +1,41 @@
 const { ApolloServer, gql } = require("apollo-server-micro");
 const { PubSub } = require("apollo-server");
 const { prisma } = require("./prisma/generated/prisma-client");
+const _ = require("lodash");
 
 const pubsub = new PubSub();
 
 const typeDefs = gql`
+  scalar Date
+
+  interface Feed {
+    id: ID!
+    createdAt: Date!
+    updatedAt: Date!
+  }
+
   type User {
     id: ID!
     name: String!
     posts: [Post!]!
+    products: [Product!]!
   }
 
-  type Post {
+  type Post implements Feed {
     id: ID!
+    createdAt: Date!
+    updatedAt: Date!
     description: String!
+    user: User!
+  }
+
+  type Product implements Feed {
+    id: ID!
+    createdAt: Date!
+    updatedAt: Date!
+    productDescription: String!
+    price: Int
+    phoneNumber: String!
     user: User!
   }
 
@@ -22,16 +44,24 @@ const typeDefs = gql`
   }
 
   type Query {
+    feed: [Feed!]!
     posts: [Post!]!
     post(postId: ID!): Post
     users: [User!]!
     user(userId: ID!): User
+    products: [Product!]!
   }
 
   type Mutation {
     createPost(userId: ID!, description: String!): Post!
     updatePost(postId: ID!, description: String!): Post!
     deletePost(postId: ID!): Post!
+    createProduct(
+      userId: ID!
+      productDescription: String!
+      price: Int
+      phoneNumber: String!
+    ): Product!
     signUp(name: String!): User
   }
 `;
@@ -39,17 +69,41 @@ const typeDefs = gql`
 const POST_CREATED = "POST_CREATED";
 
 const resolvers = {
+  Feed: {
+    __resolveType(obj) {
+      if (obj.description) {
+        return "Post";
+      }
+
+      if (obj.productDescription) {
+        return "Product";
+      }
+
+      return null;
+    }
+  },
   Subscription: {
     postCreated: {
       subscribe: () => pubsub.asyncIterator([POST_CREATED])
     }
   },
   Query: {
+    feed: async (root, args, { prisma }) => {
+      return await Promise.all([prisma.posts(), prisma.products()]).then(
+        values => {
+          values = [].concat.apply([], values);
+          return _.sortBy(values, ["createdAt"]).reverse();
+        }
+      );
+    },
     posts: async (root, args, context) => {
       return await context.prisma.posts();
     },
     post: async (root, args, context) => {
       return await context.prisma.post({ id: args.postId });
+    },
+    products: async (root, args, context) => {
+      return await context.prisma.products();
     },
     users: async (root, args, context) => {
       return await context.prisma.users();
@@ -76,6 +130,17 @@ const resolvers = {
     deletePost: (root, args, context) => {
       return context.prisma.deletePost({ id: args.postId });
     },
+    createProduct: (root, args, context) => {
+      const newProduct = {
+        productDescription: args.productDescription,
+        price: args.price,
+        phoneNumber: args.phoneNumber,
+        user: {
+          connect: { id: args.userId }
+        }
+      };
+      return context.prisma.createProduct(newProduct);
+    },
     signUp: async (root, args, context) =>
       await context.prisma.createUser({ name: args.name })
   },
@@ -86,12 +151,28 @@ const resolvers = {
           id: root.id
         })
         .posts();
+    },
+    products: (root, args, context) => {
+      return context.prisma
+        .user({
+          id: root.id
+        })
+        .products();
     }
   },
   Post: {
     user: (root, args, context) => {
       return context.prisma
         .post({
+          id: root.id
+        })
+        .user();
+    }
+  },
+  Product: {
+    user: (root, args, context) => {
+      return context.prisma
+        .product({
           id: root.id
         })
         .user();

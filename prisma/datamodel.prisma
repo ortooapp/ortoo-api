@@ -2,10 +2,23 @@ type User {
   id: ID! @id
   name: String!
   posts: [Post!]!
+  products: [Product!]!
 }
 
 type Post {
   id: ID! @id
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
   description: String!
+  user: User!
+}
+
+type Product {
+  id: ID! @id
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  productDescription: String!
+  price: Float
+  phoneNumber: String!
   user: User!
 }
