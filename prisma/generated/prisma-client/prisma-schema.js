@@ -589,6 +589,8 @@ type Subscription {
 type User {
   id: ID!
   name: String!
+  email: String!
+  password: String!
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
   products(where: ProductWhereInput, orderBy: ProductOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Product!]
 }
@@ -602,6 +604,8 @@ type UserConnection {
 input UserCreateInput {
   id: ID
   name: String!
+  email: String!
+  password: String!
   posts: PostCreateManyWithoutUserInput
   products: ProductCreateManyWithoutUserInput
 }
@@ -619,12 +623,16 @@ input UserCreateOneWithoutProductsInput {
 input UserCreateWithoutPostsInput {
   id: ID
   name: String!
+  email: String!
+  password: String!
   products: ProductCreateManyWithoutUserInput
 }
 
 input UserCreateWithoutProductsInput {
   id: ID
   name: String!
+  email: String!
+  password: String!
   posts: PostCreateManyWithoutUserInput
 }
 
@@ -638,11 +646,17 @@ enum UserOrderByInput {
   id_DESC
   name_ASC
   name_DESC
+  email_ASC
+  email_DESC
+  password_ASC
+  password_DESC
 }
 
 type UserPreviousValues {
   id: ID!
   name: String!
+  email: String!
+  password: String!
 }
 
 type UserSubscriptionPayload {
@@ -665,12 +679,16 @@ input UserSubscriptionWhereInput {
 
 input UserUpdateInput {
   name: String
+  email: String
+  password: String
   posts: PostUpdateManyWithoutUserInput
   products: ProductUpdateManyWithoutUserInput
 }
 
 input UserUpdateManyMutationInput {
   name: String
+  email: String
+  password: String
 }
 
 input UserUpdateOneRequiredWithoutPostsInput {
@@ -689,11 +707,15 @@ input UserUpdateOneRequiredWithoutProductsInput {
 
 input UserUpdateWithoutPostsDataInput {
   name: String
+  email: String
+  password: String
   products: ProductUpdateManyWithoutUserInput
 }
 
 input UserUpdateWithoutProductsDataInput {
   name: String
+  email: String
+  password: String
   posts: PostUpdateManyWithoutUserInput
 }
 
@@ -736,6 +758,34 @@ input UserWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
+  email: String
+  email_not: String
+  email_in: [String!]
+  email_not_in: [String!]
+  email_lt: String
+  email_lte: String
+  email_gt: String
+  email_gte: String
+  email_contains: String
+  email_not_contains: String
+  email_starts_with: String
+  email_not_starts_with: String
+  email_ends_with: String
+  email_not_ends_with: String
+  password: String
+  password_not: String
+  password_in: [String!]
+  password_not_in: [String!]
+  password_lt: String
+  password_lte: String
+  password_gt: String
+  password_gte: String
+  password_contains: String
+  password_not_contains: String
+  password_starts_with: String
+  password_not_starts_with: String
+  password_ends_with: String
+  password_not_ends_with: String
   posts_every: PostWhereInput
   posts_some: PostWhereInput
   posts_none: PostWhereInput
@@ -749,6 +799,7 @@ input UserWhereInput {
 
 input UserWhereUniqueInput {
   id: ID
+  email: String
 }
 `
       }

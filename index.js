@@ -2,6 +2,10 @@ const { ApolloServer, gql } = require("apollo-server-micro");
 const { PubSub } = require("apollo-server");
 const { prisma } = require("./prisma/generated/prisma-client");
 const _ = require("lodash");
+const { hash, compare } = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+const JWT_SECRET = "secret113";
 
 const pubsub = new PubSub();
 
@@ -17,8 +21,15 @@ const typeDefs = gql`
   type User {
     id: ID!
     name: String!
+    email: String!
+    password: String!
     posts: [Post!]!
     products: [Product!]!
+  }
+
+  type LoginResponse {
+    token: String!
+    user: User!
   }
 
   type Post implements Feed {
@@ -49,16 +60,16 @@ const typeDefs = gql`
     post(postId: ID!): Post
     users: [User!]!
     user(userId: ID!): User
+    me: User
     products: [Product!]!
     product(productId: ID!): Product
   }
 
   type Mutation {
-    createPost(userId: ID!, description: String!): Post!
+    createPost(description: String!): Post!
     updatePost(postId: ID!, description: String!): Post!
     deletePost(postId: ID!): Post!
     createProduct(
-      userId: ID!
       productDescription: String!
       price: Int
       phoneNumber: String!
@@ -70,7 +81,8 @@ const typeDefs = gql`
       phoneNumber: String
     ): Product!
     deleteProduct(productId: ID!): Product!
-    signUp(name: String!): User
+    signUp(name: String!, email: String!, password: String!): User
+    signIn(email: String!, password: String!): LoginResponse
   }
 `;
 
@@ -118,6 +130,9 @@ const resolvers = {
     },
     users: async (root, args, context) => {
       return await context.prisma.users();
+    },
+    me: async (root, args, context) => {
+      return await context.prisma.user({ id: context.user.id });
     }
   },
   Mutation: {
@@ -125,7 +140,7 @@ const resolvers = {
       const newPost = {
         description: args.description,
         user: {
-          connect: { id: args.userId }
+          connect: { id: context.user.id }
         }
       };
 
@@ -147,7 +162,7 @@ const resolvers = {
         price: args.price,
         phoneNumber: args.phoneNumber,
         user: {
-          connect: { id: args.userId }
+          connect: { id: context.user.id }
         }
       };
       return context.prisma.createProduct(newProduct);
@@ -165,8 +180,28 @@ const resolvers = {
     deleteProduct: (root, args, context) => {
       return context.prisma.deleteProduct({ id: args.productId });
     },
-    signUp: async (root, args, context) =>
-      await context.prisma.createUser({ name: args.name })
+    signUp: async (root, args, context) => {
+      return await context.prisma.createUser({
+        name: args.name,
+        email: args.email,
+        password: await hash(args.password, 10)
+      });
+    },
+    signIn: async (root, { email, password }, context) => {
+      const user = await context.prisma.user({ email });
+      if (!user) {
+        throw new Error(`User not found for email: ${email}`);
+      }
+      const passwordValid = await compare(password, user.password);
+      if (!passwordValid) {
+        throw new Error("Invalid password");
+      }
+
+      return {
+        token: jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" }),
+        user
+      };
+    }
   },
   User: {
     posts: (root, args, context) => {
@@ -204,6 +239,17 @@ const resolvers = {
   }
 };
 
+const getUser = token => {
+  try {
+    if (token) {
+      return jwt.verify(token, JWT_SECRET);
+    }
+    return null;
+  } catch (err) {
+    return null;
+  }
+};
+
 const apolloServer = new ApolloServer({
   typeDefs,
   resolvers,
@@ -213,8 +259,12 @@ const apolloServer = new ApolloServer({
     if (connection) {
       return connection.context;
     } else {
-      const token = req.headers.authorization || "";
-      return { prisma, token };
+      const tokenWithBearer = req.headers.authorization || "";
+      const token = tokenWithBearer.split(" ")[1];
+
+      const user = getUser(token);
+
+      return { prisma, user };
     }
   }
 });
