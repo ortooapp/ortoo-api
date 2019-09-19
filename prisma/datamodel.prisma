@@ -13,6 +13,7 @@ type Post {
   updatedAt: DateTime! @updatedAt
   description: String!
   user: User!
+  likes: [Like!]!
 }
 
 type Product {
@@ -22,5 +23,13 @@ type Product {
   productDescription: String!
   price: Float
   phoneNumber: String!
+  user: User!
+}
+
+type Like {
+  id: ID! @id
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  post: Post!
   user: User!
 }

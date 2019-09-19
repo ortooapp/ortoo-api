@@ -1,3 +1,4 @@
+const cors = require("micro-cors")();
 const { ApolloServer, gql } = require("apollo-server-micro");
 const { PubSub } = require("apollo-server");
 const { prisma } = require("./prisma/generated/prisma-client");
@@ -47,6 +48,14 @@ const typeDefs = gql`
     productDescription: String!
     price: Int
     phoneNumber: String!
+    user: User!
+  }
+
+  type Like {
+    id: ID!
+    createdAt: Date!
+    updatedAt: Date!
+    post: Post!
     user: User!
   }
 
@@ -269,4 +278,4 @@ const apolloServer = new ApolloServer({
   }
 });
 
-module.exports = apolloServer.createHandler();
+module.exports = cors(apolloServer.createHandler());
