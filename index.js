@@ -278,4 +278,12 @@ const apolloServer = new ApolloServer({
   }
 });
 
-module.exports = cors(apolloServer.createHandler());
+// module.exports = cors(apolloServer.createHandler());
+
+module.exports = cors((req, res) => {
+  if (req.method === "OPTIONS") {
+    res.end();
+    return;
+  }
+  return apolloServer.createHandler()(req, res);
+});
