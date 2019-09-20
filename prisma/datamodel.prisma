@@ -21,7 +21,7 @@ type Product {
   createdAt: DateTime! @createdAt
   updatedAt: DateTime! @updatedAt
   productDescription: String!
-  price: Float
+  price: Float!
   phoneNumber: String!
   user: User!
 }

@@ -46,7 +46,7 @@ const typeDefs = gql`
     createdAt: Date!
     updatedAt: Date!
     productDescription: String!
-    price: Int
+    price: Float!
     phoneNumber: String!
     user: User!
   }
@@ -80,13 +80,13 @@ const typeDefs = gql`
     deletePost(postId: ID!): Post!
     createProduct(
       productDescription: String!
-      price: Int
+      price: String!
       phoneNumber: String!
     ): Product!
     updateProduct(
       productId: ID!
       productDescription: String
-      price: Int
+      price: Float!
       phoneNumber: String
     ): Product!
     deleteProduct(productId: ID!): Product!
@@ -141,7 +141,8 @@ const resolvers = {
       return await context.prisma.users();
     },
     me: async (root, args, context) => {
-      return await context.prisma.user({ id: context.user.id });
+      const userId = context.user && context.user.id;
+      return await context.prisma.user({ id: userId });
     }
   },
   Mutation: {
