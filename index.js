@@ -430,6 +430,7 @@ const getUser = token => {
 };
 
 const apolloServer = new ApolloServer({
+  cors: true,
   typeDefs,
   resolvers,
   introspection: true,
