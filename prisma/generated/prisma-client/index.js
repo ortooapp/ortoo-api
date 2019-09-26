@@ -17,6 +17,18 @@ var models = [
     embedded: false
   },
   {
+    name: "Category",
+    embedded: false
+  },
+  {
+    name: "ProductCategory",
+    embedded: false
+  },
+  {
+    name: "File",
+    embedded: false
+  },
+  {
     name: "Like",
     embedded: false
   }

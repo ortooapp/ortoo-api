@@ -1,10 +1,21 @@
 const cors = require("micro-cors")();
 const { ApolloServer, gql } = require("apollo-server-micro");
 const { PubSub } = require("apollo-server");
+// const { ApolloServer, gql, PubSub } = require("apollo-server");
 const { prisma } = require("./prisma/generated/prisma-client");
 const _ = require("lodash");
 const { hash, compare } = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const AWS = require("aws-sdk");
+
+const s3 = new AWS.S3({
+  apiVersion: "2006-03-01",
+  endpoint: "s3.cn-north-1.jdcloud-oss.com",
+  accessKeyId: "A7487560A7B27AE4A5744D14C1DC152C",
+  secretAccessKey: "6466ECB2C88AF6A5FECA76D880EDC64F",
+  s3ForcePathStyle: true,
+  signatureVersion: "v4"
+});
 
 const JWT_SECRET = "secret113";
 
@@ -26,6 +37,7 @@ const typeDefs = gql`
     password: String!
     posts: [Post!]!
     products: [Product!]!
+    file: File
   }
 
   type LoginResponse {
@@ -39,6 +51,9 @@ const typeDefs = gql`
     updatedAt: Date!
     description: String!
     user: User!
+    category: Category!
+    files: [File!]!
+    likes: [Like!]!
   }
 
   type Product implements Feed {
@@ -49,6 +64,28 @@ const typeDefs = gql`
     price: Float!
     phoneNumber: String!
     user: User!
+    files: [File!]!
+    productCategory: ProductCategory!
+  }
+
+  type Category {
+    id: ID!
+    name: String!
+    posts: [Post!]!
+  }
+
+  type ProductCategory {
+    id: ID!
+    name: String!
+    posts: [Post!]!
+  }
+
+  type File {
+    id: ID!
+    filename: String
+    mimetype: String
+    encoding: String
+    url: String
   }
 
   type Like {
@@ -72,16 +109,22 @@ const typeDefs = gql`
     me: User
     products: [Product!]!
     product(productId: ID!): Product
+    categories: [Category!]!
+    productCategories: [ProductCategory!]!
+    likes: [Like!]!
   }
 
   type Mutation {
-    createPost(description: String!): Post!
+    createPost(description: String!, categoryId: ID!, files: [Upload!]!): Post!
     updatePost(postId: ID!, description: String!): Post!
     deletePost(postId: ID!): Post!
+    likePost(postId: ID!): Like!
     createProduct(
       productDescription: String!
-      price: String!
+      price: Float!
       phoneNumber: String!
+      categoryId: ID!
+      files: [Upload!]!
     ): Product!
     updateProduct(
       productId: ID!
@@ -90,12 +133,40 @@ const typeDefs = gql`
       phoneNumber: String
     ): Product!
     deleteProduct(productId: ID!): Product!
+    createCategory(name: String!): Category!
+    createProductCategory(name: String!): ProductCategory!
     signUp(name: String!, email: String!, password: String!): User
     signIn(email: String!, password: String!): LoginResponse
   }
 `;
 
 const POST_CREATED = "POST_CREATED";
+
+const processUpload = async upload => {
+  let { filename, mimetype, encoding, createReadStream } = await upload;
+  let stream = createReadStream();
+
+  const response = await s3
+    .upload({
+      Bucket: "ortoo",
+      Key: filename,
+      Body: stream,
+      ACL: "public-read",
+      ContentType: mimetype
+    })
+    .promise();
+
+  const url = response.Location;
+
+  const file = {
+    filename,
+    mimetype,
+    encoding,
+    url
+  };
+
+  return file;
+};
 
 const resolvers = {
   Feed: {
@@ -132,7 +203,9 @@ const resolvers = {
       return await context.prisma.post({ id: args.postId });
     },
     products: async (root, args, context) => {
-      return await context.prisma.products();
+      return await context.prisma.products({
+        orderBy: "createdAt_DESC"
+      });
     },
     product: async (root, args, context) => {
       return await context.prisma.product({ id: args.productId });
@@ -143,14 +216,31 @@ const resolvers = {
     me: async (root, args, context) => {
       const userId = context.user && context.user.id;
       return await context.prisma.user({ id: userId });
+    },
+    categories: async (root, args, context) => {
+      return await context.prisma.categories();
+    },
+    productCategories: async (root, args, context) => {
+      return await context.prisma.productCategories();
+    },
+    likes: async (root, args, context) => {
+      return await context.prisma.post({ id: root.id }).likes();
     }
   },
   Mutation: {
-    createPost: (root, args, context) => {
+    createPost: async (root, args, context) => {
       const newPost = {
         description: args.description,
         user: {
           connect: { id: context.user.id }
+        },
+        category: {
+          connect: { id: args.categoryId }
+        },
+        files: {
+          create: await Promise.all(
+            args.files.map(async file => processUpload(file))
+          )
         }
       };
 
@@ -166,13 +256,31 @@ const resolvers = {
     deletePost: (root, args, context) => {
       return context.prisma.deletePost({ id: args.postId });
     },
-    createProduct: (root, args, context) => {
+    likePost: (root, args, context) => {
+      return context.prisma.createLike({
+        post: {
+          connect: { id: args.postId }
+        },
+        user: {
+          connect: { id: context.user.id }
+        }
+      });
+    },
+    createProduct: async (root, args, context) => {
       const newProduct = {
         productDescription: args.productDescription,
         price: args.price,
         phoneNumber: args.phoneNumber,
         user: {
           connect: { id: context.user.id }
+        },
+        productCategory: {
+          connect: { id: args.categoryId }
+        },
+        files: {
+          create: await Promise.all(
+            args.files.map(async file => processUpload(file))
+          )
         }
       };
       return context.prisma.createProduct(newProduct);
@@ -189,6 +297,16 @@ const resolvers = {
     },
     deleteProduct: (root, args, context) => {
       return context.prisma.deleteProduct({ id: args.productId });
+    },
+    createCategory: (root, args, context) => {
+      return context.prisma.createCategory({
+        name: args.name
+      });
+    },
+    createProductCategory: (root, args, context) => {
+      return context.prisma.createProductCategory({
+        name: args.name
+      });
     },
     signUp: async (root, args, context) => {
       return await context.prisma.createUser({
@@ -208,7 +326,7 @@ const resolvers = {
       }
 
       return {
-        token: jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "1h" }),
+        token: jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "30d" }),
         user
       };
     }
@@ -236,12 +354,63 @@ const resolvers = {
           id: root.id
         })
         .user();
+    },
+    category: async (root, args, context) => {
+      return await context.prisma
+        .post({
+          id: root.id
+        })
+        .category();
+    },
+    files: (root, args, context) => {
+      return context.prisma
+        .post({
+          id: root.id
+        })
+        .files();
+    },
+    likes: async (root, args, context) => {
+      return await context.prisma
+        .post({
+          id: root.id
+        })
+        .likes();
     }
   },
   Product: {
     user: (root, args, context) => {
       return context.prisma
         .product({
+          id: root.id
+        })
+        .user();
+    },
+    productCategory: async (root, args, context) => {
+      return await context.prisma
+        .product({
+          id: root.id
+        })
+        .productCategory();
+    },
+    files: (root, args, context) => {
+      return context.prisma
+        .product({
+          id: root.id
+        })
+        .files();
+    }
+  },
+  Like: {
+    post: async (root, args, context) => {
+      return context.prisma
+        .like({
+          id: root.id
+        })
+        .post();
+    },
+    user: async (root, args, context) => {
+      return await context.prisma
+        .like({
           id: root.id
         })
         .user();
@@ -288,3 +457,7 @@ module.exports = cors((req, res) => {
   }
   return apolloServer.createHandler()(req, res);
 });
+
+// apolloServer.listen().then(({ url }) => {
+//   console.log(`🚀  Server ready at ${url}`);
+// });

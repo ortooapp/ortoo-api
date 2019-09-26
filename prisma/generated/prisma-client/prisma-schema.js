@@ -3,7 +3,15 @@ module.exports = {
   // Please don't change this file manually but run `prisma generate` to update it.
   // For more information, please read the docs: https://www.prisma.io/docs/prisma-client/
 
-/* GraphQL */ `type AggregateLike {
+/* GraphQL */ `type AggregateCategory {
+  count: Int!
+}
+
+type AggregateFile {
+  count: Int!
+}
+
+type AggregateLike {
   count: Int!
 }
 
@@ -15,6 +23,10 @@ type AggregateProduct {
   count: Int!
 }
 
+type AggregateProductCategory {
+  count: Int!
+}
+
 type AggregateUser {
   count: Int!
 }
@@ -23,7 +35,478 @@ type BatchPayload {
   count: Long!
 }
 
+type Category {
+  id: ID!
+  name: String!
+  posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
+}
+
+type CategoryConnection {
+  pageInfo: PageInfo!
+  edges: [CategoryEdge]!
+  aggregate: AggregateCategory!
+}
+
+input CategoryCreateInput {
+  id: ID
+  name: String!
+  posts: PostCreateManyWithoutCategoryInput
+}
+
+input CategoryCreateOneWithoutPostsInput {
+  create: CategoryCreateWithoutPostsInput
+  connect: CategoryWhereUniqueInput
+}
+
+input CategoryCreateWithoutPostsInput {
+  id: ID
+  name: String!
+}
+
+type CategoryEdge {
+  node: Category!
+  cursor: String!
+}
+
+enum CategoryOrderByInput {
+  id_ASC
+  id_DESC
+  name_ASC
+  name_DESC
+}
+
+type CategoryPreviousValues {
+  id: ID!
+  name: String!
+}
+
+type CategorySubscriptionPayload {
+  mutation: MutationType!
+  node: Category
+  updatedFields: [String!]
+  previousValues: CategoryPreviousValues
+}
+
+input CategorySubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: CategoryWhereInput
+  AND: [CategorySubscriptionWhereInput!]
+  OR: [CategorySubscriptionWhereInput!]
+  NOT: [CategorySubscriptionWhereInput!]
+}
+
+input CategoryUpdateInput {
+  name: String
+  posts: PostUpdateManyWithoutCategoryInput
+}
+
+input CategoryUpdateManyMutationInput {
+  name: String
+}
+
+input CategoryUpdateOneRequiredWithoutPostsInput {
+  create: CategoryCreateWithoutPostsInput
+  update: CategoryUpdateWithoutPostsDataInput
+  upsert: CategoryUpsertWithoutPostsInput
+  connect: CategoryWhereUniqueInput
+}
+
+input CategoryUpdateWithoutPostsDataInput {
+  name: String
+}
+
+input CategoryUpsertWithoutPostsInput {
+  update: CategoryUpdateWithoutPostsDataInput!
+  create: CategoryCreateWithoutPostsInput!
+}
+
+input CategoryWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  posts_every: PostWhereInput
+  posts_some: PostWhereInput
+  posts_none: PostWhereInput
+  AND: [CategoryWhereInput!]
+  OR: [CategoryWhereInput!]
+  NOT: [CategoryWhereInput!]
+}
+
+input CategoryWhereUniqueInput {
+  id: ID
+}
+
 scalar DateTime
+
+type File {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  filename: String!
+  mimetype: String!
+  encoding: String!
+  url: String!
+}
+
+type FileConnection {
+  pageInfo: PageInfo!
+  edges: [FileEdge]!
+  aggregate: AggregateFile!
+}
+
+input FileCreateInput {
+  id: ID
+  filename: String!
+  mimetype: String!
+  encoding: String!
+  url: String!
+}
+
+input FileCreateManyInput {
+  create: [FileCreateInput!]
+  connect: [FileWhereUniqueInput!]
+}
+
+input FileCreateOneInput {
+  create: FileCreateInput
+  connect: FileWhereUniqueInput
+}
+
+type FileEdge {
+  node: File!
+  cursor: String!
+}
+
+enum FileOrderByInput {
+  id_ASC
+  id_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  filename_ASC
+  filename_DESC
+  mimetype_ASC
+  mimetype_DESC
+  encoding_ASC
+  encoding_DESC
+  url_ASC
+  url_DESC
+}
+
+type FilePreviousValues {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  filename: String!
+  mimetype: String!
+  encoding: String!
+  url: String!
+}
+
+input FileScalarWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  filename: String
+  filename_not: String
+  filename_in: [String!]
+  filename_not_in: [String!]
+  filename_lt: String
+  filename_lte: String
+  filename_gt: String
+  filename_gte: String
+  filename_contains: String
+  filename_not_contains: String
+  filename_starts_with: String
+  filename_not_starts_with: String
+  filename_ends_with: String
+  filename_not_ends_with: String
+  mimetype: String
+  mimetype_not: String
+  mimetype_in: [String!]
+  mimetype_not_in: [String!]
+  mimetype_lt: String
+  mimetype_lte: String
+  mimetype_gt: String
+  mimetype_gte: String
+  mimetype_contains: String
+  mimetype_not_contains: String
+  mimetype_starts_with: String
+  mimetype_not_starts_with: String
+  mimetype_ends_with: String
+  mimetype_not_ends_with: String
+  encoding: String
+  encoding_not: String
+  encoding_in: [String!]
+  encoding_not_in: [String!]
+  encoding_lt: String
+  encoding_lte: String
+  encoding_gt: String
+  encoding_gte: String
+  encoding_contains: String
+  encoding_not_contains: String
+  encoding_starts_with: String
+  encoding_not_starts_with: String
+  encoding_ends_with: String
+  encoding_not_ends_with: String
+  url: String
+  url_not: String
+  url_in: [String!]
+  url_not_in: [String!]
+  url_lt: String
+  url_lte: String
+  url_gt: String
+  url_gte: String
+  url_contains: String
+  url_not_contains: String
+  url_starts_with: String
+  url_not_starts_with: String
+  url_ends_with: String
+  url_not_ends_with: String
+  AND: [FileScalarWhereInput!]
+  OR: [FileScalarWhereInput!]
+  NOT: [FileScalarWhereInput!]
+}
+
+type FileSubscriptionPayload {
+  mutation: MutationType!
+  node: File
+  updatedFields: [String!]
+  previousValues: FilePreviousValues
+}
+
+input FileSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: FileWhereInput
+  AND: [FileSubscriptionWhereInput!]
+  OR: [FileSubscriptionWhereInput!]
+  NOT: [FileSubscriptionWhereInput!]
+}
+
+input FileUpdateDataInput {
+  filename: String
+  mimetype: String
+  encoding: String
+  url: String
+}
+
+input FileUpdateInput {
+  filename: String
+  mimetype: String
+  encoding: String
+  url: String
+}
+
+input FileUpdateManyDataInput {
+  filename: String
+  mimetype: String
+  encoding: String
+  url: String
+}
+
+input FileUpdateManyInput {
+  create: [FileCreateInput!]
+  update: [FileUpdateWithWhereUniqueNestedInput!]
+  upsert: [FileUpsertWithWhereUniqueNestedInput!]
+  delete: [FileWhereUniqueInput!]
+  connect: [FileWhereUniqueInput!]
+  set: [FileWhereUniqueInput!]
+  disconnect: [FileWhereUniqueInput!]
+  deleteMany: [FileScalarWhereInput!]
+  updateMany: [FileUpdateManyWithWhereNestedInput!]
+}
+
+input FileUpdateManyMutationInput {
+  filename: String
+  mimetype: String
+  encoding: String
+  url: String
+}
+
+input FileUpdateManyWithWhereNestedInput {
+  where: FileScalarWhereInput!
+  data: FileUpdateManyDataInput!
+}
+
+input FileUpdateOneInput {
+  create: FileCreateInput
+  update: FileUpdateDataInput
+  upsert: FileUpsertNestedInput
+  delete: Boolean
+  disconnect: Boolean
+  connect: FileWhereUniqueInput
+}
+
+input FileUpdateWithWhereUniqueNestedInput {
+  where: FileWhereUniqueInput!
+  data: FileUpdateDataInput!
+}
+
+input FileUpsertNestedInput {
+  update: FileUpdateDataInput!
+  create: FileCreateInput!
+}
+
+input FileUpsertWithWhereUniqueNestedInput {
+  where: FileWhereUniqueInput!
+  update: FileUpdateDataInput!
+  create: FileCreateInput!
+}
+
+input FileWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  filename: String
+  filename_not: String
+  filename_in: [String!]
+  filename_not_in: [String!]
+  filename_lt: String
+  filename_lte: String
+  filename_gt: String
+  filename_gte: String
+  filename_contains: String
+  filename_not_contains: String
+  filename_starts_with: String
+  filename_not_starts_with: String
+  filename_ends_with: String
+  filename_not_ends_with: String
+  mimetype: String
+  mimetype_not: String
+  mimetype_in: [String!]
+  mimetype_not_in: [String!]
+  mimetype_lt: String
+  mimetype_lte: String
+  mimetype_gt: String
+  mimetype_gte: String
+  mimetype_contains: String
+  mimetype_not_contains: String
+  mimetype_starts_with: String
+  mimetype_not_starts_with: String
+  mimetype_ends_with: String
+  mimetype_not_ends_with: String
+  encoding: String
+  encoding_not: String
+  encoding_in: [String!]
+  encoding_not_in: [String!]
+  encoding_lt: String
+  encoding_lte: String
+  encoding_gt: String
+  encoding_gte: String
+  encoding_contains: String
+  encoding_not_contains: String
+  encoding_starts_with: String
+  encoding_not_starts_with: String
+  encoding_ends_with: String
+  encoding_not_ends_with: String
+  url: String
+  url_not: String
+  url_in: [String!]
+  url_not_in: [String!]
+  url_lt: String
+  url_lte: String
+  url_gt: String
+  url_gte: String
+  url_contains: String
+  url_not_contains: String
+  url_starts_with: String
+  url_not_starts_with: String
+  url_ends_with: String
+  url_not_ends_with: String
+  AND: [FileWhereInput!]
+  OR: [FileWhereInput!]
+  NOT: [FileWhereInput!]
+}
+
+input FileWhereUniqueInput {
+  id: ID
+}
 
 type Like {
   id: ID!
@@ -205,6 +688,18 @@ input LikeWhereUniqueInput {
 scalar Long
 
 type Mutation {
+  createCategory(data: CategoryCreateInput!): Category!
+  updateCategory(data: CategoryUpdateInput!, where: CategoryWhereUniqueInput!): Category
+  updateManyCategories(data: CategoryUpdateManyMutationInput!, where: CategoryWhereInput): BatchPayload!
+  upsertCategory(where: CategoryWhereUniqueInput!, create: CategoryCreateInput!, update: CategoryUpdateInput!): Category!
+  deleteCategory(where: CategoryWhereUniqueInput!): Category
+  deleteManyCategories(where: CategoryWhereInput): BatchPayload!
+  createFile(data: FileCreateInput!): File!
+  updateFile(data: FileUpdateInput!, where: FileWhereUniqueInput!): File
+  updateManyFiles(data: FileUpdateManyMutationInput!, where: FileWhereInput): BatchPayload!
+  upsertFile(where: FileWhereUniqueInput!, create: FileCreateInput!, update: FileUpdateInput!): File!
+  deleteFile(where: FileWhereUniqueInput!): File
+  deleteManyFiles(where: FileWhereInput): BatchPayload!
   createLike(data: LikeCreateInput!): Like!
   updateLike(data: LikeUpdateInput!, where: LikeWhereUniqueInput!): Like
   upsertLike(where: LikeWhereUniqueInput!, create: LikeCreateInput!, update: LikeUpdateInput!): Like!
@@ -222,6 +717,12 @@ type Mutation {
   upsertProduct(where: ProductWhereUniqueInput!, create: ProductCreateInput!, update: ProductUpdateInput!): Product!
   deleteProduct(where: ProductWhereUniqueInput!): Product
   deleteManyProducts(where: ProductWhereInput): BatchPayload!
+  createProductCategory(data: ProductCategoryCreateInput!): ProductCategory!
+  updateProductCategory(data: ProductCategoryUpdateInput!, where: ProductCategoryWhereUniqueInput!): ProductCategory
+  updateManyProductCategories(data: ProductCategoryUpdateManyMutationInput!, where: ProductCategoryWhereInput): BatchPayload!
+  upsertProductCategory(where: ProductCategoryWhereUniqueInput!, create: ProductCategoryCreateInput!, update: ProductCategoryUpdateInput!): ProductCategory!
+  deleteProductCategory(where: ProductCategoryWhereUniqueInput!): ProductCategory
+  deleteManyProductCategories(where: ProductCategoryWhereInput): BatchPayload!
   createUser(data: UserCreateInput!): User!
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
@@ -253,6 +754,8 @@ type Post {
   updatedAt: DateTime!
   description: String!
   user: User!
+  category: Category!
+  files(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [File!]
   likes(where: LikeWhereInput, orderBy: LikeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Like!]
 }
 
@@ -266,7 +769,14 @@ input PostCreateInput {
   id: ID
   description: String!
   user: UserCreateOneWithoutPostsInput!
+  category: CategoryCreateOneWithoutPostsInput!
+  files: FileCreateManyInput
   likes: LikeCreateManyWithoutPostInput
+}
+
+input PostCreateManyWithoutCategoryInput {
+  create: [PostCreateWithoutCategoryInput!]
+  connect: [PostWhereUniqueInput!]
 }
 
 input PostCreateManyWithoutUserInput {
@@ -279,15 +789,27 @@ input PostCreateOneWithoutLikesInput {
   connect: PostWhereUniqueInput
 }
 
+input PostCreateWithoutCategoryInput {
+  id: ID
+  description: String!
+  user: UserCreateOneWithoutPostsInput!
+  files: FileCreateManyInput
+  likes: LikeCreateManyWithoutPostInput
+}
+
 input PostCreateWithoutLikesInput {
   id: ID
   description: String!
   user: UserCreateOneWithoutPostsInput!
+  category: CategoryCreateOneWithoutPostsInput!
+  files: FileCreateManyInput
 }
 
 input PostCreateWithoutUserInput {
   id: ID
   description: String!
+  category: CategoryCreateOneWithoutPostsInput!
+  files: FileCreateManyInput
   likes: LikeCreateManyWithoutPostInput
 }
 
@@ -385,6 +907,8 @@ input PostSubscriptionWhereInput {
 input PostUpdateInput {
   description: String
   user: UserUpdateOneRequiredWithoutPostsInput
+  category: CategoryUpdateOneRequiredWithoutPostsInput
+  files: FileUpdateManyInput
   likes: LikeUpdateManyWithoutPostInput
 }
 
@@ -394,6 +918,18 @@ input PostUpdateManyDataInput {
 
 input PostUpdateManyMutationInput {
   description: String
+}
+
+input PostUpdateManyWithoutCategoryInput {
+  create: [PostCreateWithoutCategoryInput!]
+  delete: [PostWhereUniqueInput!]
+  connect: [PostWhereUniqueInput!]
+  set: [PostWhereUniqueInput!]
+  disconnect: [PostWhereUniqueInput!]
+  update: [PostUpdateWithWhereUniqueWithoutCategoryInput!]
+  upsert: [PostUpsertWithWhereUniqueWithoutCategoryInput!]
+  deleteMany: [PostScalarWhereInput!]
+  updateMany: [PostUpdateManyWithWhereNestedInput!]
 }
 
 input PostUpdateManyWithoutUserInput {
@@ -420,14 +956,30 @@ input PostUpdateOneRequiredWithoutLikesInput {
   connect: PostWhereUniqueInput
 }
 
+input PostUpdateWithoutCategoryDataInput {
+  description: String
+  user: UserUpdateOneRequiredWithoutPostsInput
+  files: FileUpdateManyInput
+  likes: LikeUpdateManyWithoutPostInput
+}
+
 input PostUpdateWithoutLikesDataInput {
   description: String
   user: UserUpdateOneRequiredWithoutPostsInput
+  category: CategoryUpdateOneRequiredWithoutPostsInput
+  files: FileUpdateManyInput
 }
 
 input PostUpdateWithoutUserDataInput {
   description: String
+  category: CategoryUpdateOneRequiredWithoutPostsInput
+  files: FileUpdateManyInput
   likes: LikeUpdateManyWithoutPostInput
+}
+
+input PostUpdateWithWhereUniqueWithoutCategoryInput {
+  where: PostWhereUniqueInput!
+  data: PostUpdateWithoutCategoryDataInput!
 }
 
 input PostUpdateWithWhereUniqueWithoutUserInput {
@@ -438,6 +990,12 @@ input PostUpdateWithWhereUniqueWithoutUserInput {
 input PostUpsertWithoutLikesInput {
   update: PostUpdateWithoutLikesDataInput!
   create: PostCreateWithoutLikesInput!
+}
+
+input PostUpsertWithWhereUniqueWithoutCategoryInput {
+  where: PostWhereUniqueInput!
+  update: PostUpdateWithoutCategoryDataInput!
+  create: PostCreateWithoutCategoryInput!
 }
 
 input PostUpsertWithWhereUniqueWithoutUserInput {
@@ -492,6 +1050,10 @@ input PostWhereInput {
   description_ends_with: String
   description_not_ends_with: String
   user: UserWhereInput
+  category: CategoryWhereInput
+  files_every: FileWhereInput
+  files_some: FileWhereInput
+  files_none: FileWhereInput
   likes_every: LikeWhereInput
   likes_some: LikeWhereInput
   likes_none: LikeWhereInput
@@ -512,6 +1074,137 @@ type Product {
   price: Float!
   phoneNumber: String!
   user: User!
+  productCategory: ProductCategory!
+  files(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [File!]
+}
+
+type ProductCategory {
+  id: ID!
+  name: String!
+  products(where: ProductWhereInput, orderBy: ProductOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Product!]
+}
+
+type ProductCategoryConnection {
+  pageInfo: PageInfo!
+  edges: [ProductCategoryEdge]!
+  aggregate: AggregateProductCategory!
+}
+
+input ProductCategoryCreateInput {
+  id: ID
+  name: String!
+  products: ProductCreateManyWithoutProductCategoryInput
+}
+
+input ProductCategoryCreateOneWithoutProductsInput {
+  create: ProductCategoryCreateWithoutProductsInput
+  connect: ProductCategoryWhereUniqueInput
+}
+
+input ProductCategoryCreateWithoutProductsInput {
+  id: ID
+  name: String!
+}
+
+type ProductCategoryEdge {
+  node: ProductCategory!
+  cursor: String!
+}
+
+enum ProductCategoryOrderByInput {
+  id_ASC
+  id_DESC
+  name_ASC
+  name_DESC
+}
+
+type ProductCategoryPreviousValues {
+  id: ID!
+  name: String!
+}
+
+type ProductCategorySubscriptionPayload {
+  mutation: MutationType!
+  node: ProductCategory
+  updatedFields: [String!]
+  previousValues: ProductCategoryPreviousValues
+}
+
+input ProductCategorySubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: ProductCategoryWhereInput
+  AND: [ProductCategorySubscriptionWhereInput!]
+  OR: [ProductCategorySubscriptionWhereInput!]
+  NOT: [ProductCategorySubscriptionWhereInput!]
+}
+
+input ProductCategoryUpdateInput {
+  name: String
+  products: ProductUpdateManyWithoutProductCategoryInput
+}
+
+input ProductCategoryUpdateManyMutationInput {
+  name: String
+}
+
+input ProductCategoryUpdateOneRequiredWithoutProductsInput {
+  create: ProductCategoryCreateWithoutProductsInput
+  update: ProductCategoryUpdateWithoutProductsDataInput
+  upsert: ProductCategoryUpsertWithoutProductsInput
+  connect: ProductCategoryWhereUniqueInput
+}
+
+input ProductCategoryUpdateWithoutProductsDataInput {
+  name: String
+}
+
+input ProductCategoryUpsertWithoutProductsInput {
+  update: ProductCategoryUpdateWithoutProductsDataInput!
+  create: ProductCategoryCreateWithoutProductsInput!
+}
+
+input ProductCategoryWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  products_every: ProductWhereInput
+  products_some: ProductWhereInput
+  products_none: ProductWhereInput
+  AND: [ProductCategoryWhereInput!]
+  OR: [ProductCategoryWhereInput!]
+  NOT: [ProductCategoryWhereInput!]
+}
+
+input ProductCategoryWhereUniqueInput {
+  id: ID
 }
 
 type ProductConnection {
@@ -526,6 +1219,13 @@ input ProductCreateInput {
   price: Float!
   phoneNumber: String!
   user: UserCreateOneWithoutProductsInput!
+  productCategory: ProductCategoryCreateOneWithoutProductsInput!
+  files: FileCreateManyInput
+}
+
+input ProductCreateManyWithoutProductCategoryInput {
+  create: [ProductCreateWithoutProductCategoryInput!]
+  connect: [ProductWhereUniqueInput!]
 }
 
 input ProductCreateManyWithoutUserInput {
@@ -533,11 +1233,22 @@ input ProductCreateManyWithoutUserInput {
   connect: [ProductWhereUniqueInput!]
 }
 
+input ProductCreateWithoutProductCategoryInput {
+  id: ID
+  productDescription: String!
+  price: Float!
+  phoneNumber: String!
+  user: UserCreateOneWithoutProductsInput!
+  files: FileCreateManyInput
+}
+
 input ProductCreateWithoutUserInput {
   id: ID
   productDescription: String!
   price: Float!
   phoneNumber: String!
+  productCategory: ProductCategoryCreateOneWithoutProductsInput!
+  files: FileCreateManyInput
 }
 
 type ProductEdge {
@@ -664,6 +1375,8 @@ input ProductUpdateInput {
   price: Float
   phoneNumber: String
   user: UserUpdateOneRequiredWithoutProductsInput
+  productCategory: ProductCategoryUpdateOneRequiredWithoutProductsInput
+  files: FileUpdateManyInput
 }
 
 input ProductUpdateManyDataInput {
@@ -676,6 +1389,18 @@ input ProductUpdateManyMutationInput {
   productDescription: String
   price: Float
   phoneNumber: String
+}
+
+input ProductUpdateManyWithoutProductCategoryInput {
+  create: [ProductCreateWithoutProductCategoryInput!]
+  delete: [ProductWhereUniqueInput!]
+  connect: [ProductWhereUniqueInput!]
+  set: [ProductWhereUniqueInput!]
+  disconnect: [ProductWhereUniqueInput!]
+  update: [ProductUpdateWithWhereUniqueWithoutProductCategoryInput!]
+  upsert: [ProductUpsertWithWhereUniqueWithoutProductCategoryInput!]
+  deleteMany: [ProductScalarWhereInput!]
+  updateMany: [ProductUpdateManyWithWhereNestedInput!]
 }
 
 input ProductUpdateManyWithoutUserInput {
@@ -695,15 +1420,36 @@ input ProductUpdateManyWithWhereNestedInput {
   data: ProductUpdateManyDataInput!
 }
 
+input ProductUpdateWithoutProductCategoryDataInput {
+  productDescription: String
+  price: Float
+  phoneNumber: String
+  user: UserUpdateOneRequiredWithoutProductsInput
+  files: FileUpdateManyInput
+}
+
 input ProductUpdateWithoutUserDataInput {
   productDescription: String
   price: Float
   phoneNumber: String
+  productCategory: ProductCategoryUpdateOneRequiredWithoutProductsInput
+  files: FileUpdateManyInput
+}
+
+input ProductUpdateWithWhereUniqueWithoutProductCategoryInput {
+  where: ProductWhereUniqueInput!
+  data: ProductUpdateWithoutProductCategoryDataInput!
 }
 
 input ProductUpdateWithWhereUniqueWithoutUserInput {
   where: ProductWhereUniqueInput!
   data: ProductUpdateWithoutUserDataInput!
+}
+
+input ProductUpsertWithWhereUniqueWithoutProductCategoryInput {
+  where: ProductWhereUniqueInput!
+  update: ProductUpdateWithoutProductCategoryDataInput!
+  create: ProductCreateWithoutProductCategoryInput!
 }
 
 input ProductUpsertWithWhereUniqueWithoutUserInput {
@@ -780,6 +1526,10 @@ input ProductWhereInput {
   phoneNumber_ends_with: String
   phoneNumber_not_ends_with: String
   user: UserWhereInput
+  productCategory: ProductCategoryWhereInput
+  files_every: FileWhereInput
+  files_some: FileWhereInput
+  files_none: FileWhereInput
   AND: [ProductWhereInput!]
   OR: [ProductWhereInput!]
   NOT: [ProductWhereInput!]
@@ -790,6 +1540,12 @@ input ProductWhereUniqueInput {
 }
 
 type Query {
+  category(where: CategoryWhereUniqueInput!): Category
+  categories(where: CategoryWhereInput, orderBy: CategoryOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Category]!
+  categoriesConnection(where: CategoryWhereInput, orderBy: CategoryOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): CategoryConnection!
+  file(where: FileWhereUniqueInput!): File
+  files(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [File]!
+  filesConnection(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FileConnection!
   like(where: LikeWhereUniqueInput!): Like
   likes(where: LikeWhereInput, orderBy: LikeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Like]!
   likesConnection(where: LikeWhereInput, orderBy: LikeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): LikeConnection!
@@ -799,6 +1555,9 @@ type Query {
   product(where: ProductWhereUniqueInput!): Product
   products(where: ProductWhereInput, orderBy: ProductOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Product]!
   productsConnection(where: ProductWhereInput, orderBy: ProductOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ProductConnection!
+  productCategory(where: ProductCategoryWhereUniqueInput!): ProductCategory
+  productCategories(where: ProductCategoryWhereInput, orderBy: ProductCategoryOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ProductCategory]!
+  productCategoriesConnection(where: ProductCategoryWhereInput, orderBy: ProductCategoryOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ProductCategoryConnection!
   user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
@@ -806,9 +1565,12 @@ type Query {
 }
 
 type Subscription {
+  category(where: CategorySubscriptionWhereInput): CategorySubscriptionPayload
+  file(where: FileSubscriptionWhereInput): FileSubscriptionPayload
   like(where: LikeSubscriptionWhereInput): LikeSubscriptionPayload
   post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
   product(where: ProductSubscriptionWhereInput): ProductSubscriptionPayload
+  productCategory(where: ProductCategorySubscriptionWhereInput): ProductCategorySubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
 }
 
@@ -819,6 +1581,7 @@ type User {
   password: String!
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
   products(where: ProductWhereInput, orderBy: ProductOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Product!]
+  file: File
 }
 
 type UserConnection {
@@ -834,6 +1597,7 @@ input UserCreateInput {
   password: String!
   posts: PostCreateManyWithoutUserInput
   products: ProductCreateManyWithoutUserInput
+  file: FileCreateOneInput
 }
 
 input UserCreateOneInput {
@@ -857,6 +1621,7 @@ input UserCreateWithoutPostsInput {
   email: String!
   password: String!
   products: ProductCreateManyWithoutUserInput
+  file: FileCreateOneInput
 }
 
 input UserCreateWithoutProductsInput {
@@ -865,6 +1630,7 @@ input UserCreateWithoutProductsInput {
   email: String!
   password: String!
   posts: PostCreateManyWithoutUserInput
+  file: FileCreateOneInput
 }
 
 type UserEdge {
@@ -914,6 +1680,7 @@ input UserUpdateDataInput {
   password: String
   posts: PostUpdateManyWithoutUserInput
   products: ProductUpdateManyWithoutUserInput
+  file: FileUpdateOneInput
 }
 
 input UserUpdateInput {
@@ -922,6 +1689,7 @@ input UserUpdateInput {
   password: String
   posts: PostUpdateManyWithoutUserInput
   products: ProductUpdateManyWithoutUserInput
+  file: FileUpdateOneInput
 }
 
 input UserUpdateManyMutationInput {
@@ -956,6 +1724,7 @@ input UserUpdateWithoutPostsDataInput {
   email: String
   password: String
   products: ProductUpdateManyWithoutUserInput
+  file: FileUpdateOneInput
 }
 
 input UserUpdateWithoutProductsDataInput {
@@ -963,6 +1732,7 @@ input UserUpdateWithoutProductsDataInput {
   email: String
   password: String
   posts: PostUpdateManyWithoutUserInput
+  file: FileUpdateOneInput
 }
 
 input UserUpsertNestedInput {
@@ -1043,6 +1813,7 @@ input UserWhereInput {
   products_every: ProductWhereInput
   products_some: ProductWhereInput
   products_none: ProductWhereInput
+  file: FileWhereInput
   AND: [UserWhereInput!]
   OR: [UserWhereInput!]
   NOT: [UserWhereInput!]

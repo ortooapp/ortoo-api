@@ -5,6 +5,7 @@ type User {
   password: String!
   posts: [Post!]!
   products: [Product!]!
+  file: File
 }
 
 type Post {
@@ -13,6 +14,8 @@ type Post {
   updatedAt: DateTime! @updatedAt
   description: String!
   user: User!
+  category: Category!
+  files: [File!]!
   likes: [Like!]!
 }
 
@@ -24,6 +27,30 @@ type Product {
   price: Float!
   phoneNumber: String!
   user: User!
+  productCategory: ProductCategory!
+  files: [File!]!
+}
+
+type Category {
+  id: ID! @id
+  name: String!
+  posts: [Post!]!
+}
+
+type ProductCategory {
+  id: ID! @id
+  name: String!
+  products: [Product!]!
+}
+
+type File {
+  id: ID! @id
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
+  filename: String!
+  mimetype: String!
+  encoding: String!
+  url: String!
 }
 
 type Like {
