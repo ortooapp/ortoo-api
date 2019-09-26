@@ -1,3 +1,4 @@
+// const micro = require("micro");
 const cors = require("micro-cors")();
 const { ApolloServer, gql } = require("apollo-server-micro");
 const { PubSub } = require("apollo-server");
@@ -430,7 +431,6 @@ const getUser = token => {
 };
 
 const apolloServer = new ApolloServer({
-  cors: true,
   typeDefs,
   resolvers,
   introspection: true,
@@ -449,8 +449,6 @@ const apolloServer = new ApolloServer({
   }
 });
 
-// module.exports = cors(apolloServer.createHandler());
-
 module.exports = cors((req, res) => {
   if (req.method === "OPTIONS") {
     res.end();
@@ -458,6 +456,17 @@ module.exports = cors((req, res) => {
   }
   return apolloServer.createHandler()(req, res);
 });
+
+// const optionsHandler = (req, res) => {
+//   if (req.method === "OPTIONS") {
+//     res.end();
+//     return;
+//   }
+//   return apolloServer.createHandler()(req, res);
+// };
+
+// const microserver = micro(cors()(optionsHandler));
+// module.exports = microserver;
 
 // apolloServer.listen().then(({ url }) => {
 //   console.log(`🚀  Server ready at ${url}`);
